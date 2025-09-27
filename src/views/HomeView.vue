@@ -6,14 +6,19 @@ import { ref } from 'vue';
   const searchQuery = ref("");
   const queryTimeout = ref(null);
   const mapboxSearchResults = ref(null);
+  const searchError = ref(false);
 
   const getSearchResults = () => {
     clearTimeout(queryTimeout.value);
     queryTimeout.value = setTimeout(async () => {
       if (searchQuery.value !== "") {
-        const endpoint = `https://api.mapbox.com/search/geocode/v6/forward?q=${searchQuery.value}&access_token=${mapboxPublicToken}&types=place`;
-        const result = await axios.get(endpoint);
-        mapboxSearchResults.value = result.data.features;
+        try {
+          const endpoint = `https://api.mapbox.com/search/geocode/v6/forward?q=${searchQuery.value}&access_token=${mapboxPublicToken}&types=place&limit=10`;
+          const result = await axios.get(endpoint);
+          mapboxSearchResults.value = result.data.features;
+        } catch {
+          searchError.value = true;
+        }
         return;
       }
       mapboxSearchResults.value = null;
@@ -35,13 +40,21 @@ import { ref } from 'vue';
         v-if="mapboxSearchResults"
         class="absolute bg-weather-secondary text-white w-full shadow-md p-2 top-[66px]"
       >
-        <li 
-          v-for="searchResult in mapboxSearchResults"
-          :key="searchResult.id"
-          class="py-2 cursor-pointer"
-        >
-          {{ searchResult.properties.full_address }}
-        </li>
+        <p v-if="searchError">
+          Sorry, something went wrong. Please try again.
+        </p>
+        <p v-if="!searchError && mapboxSearchResults.length === 0">
+          No results found. Please search for a different city or state.
+        </p>
+        <template v-else>
+          <li
+            v-for="searchResult in mapboxSearchResults"
+            :key="searchResult.id"
+            class="py-2 cursor-pointer"
+          >
+            {{ searchResult.properties.full_address }}
+          </li>
+        </template>
       </ul>
     </div>
   </section>
