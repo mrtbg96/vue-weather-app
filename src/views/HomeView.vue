@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import CityList from '@/components/CityList.vue';
 
   const router = useRouter();
 
@@ -51,7 +52,7 @@ import { useRouter } from 'vue-router';
         type="text"
         v-model="searchQuery"
         @input="getSearchResults"
-        placeholder="Search for a city or state..."
+        placeholder="Search for a city..."
         class="p-2 w-full bg-transparent border-b focus:border-weather-secondary placeholder:text-gray-300 focus:outline-none focus:shadow-[0px_1px_0_0_#004E71]"
       >
       <ul
@@ -75,6 +76,17 @@ import { useRouter } from 'vue-router';
           </li>
         </template>
       </ul>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <Suspense>
+        <CityList />
+        <template #fallback>
+          <p class="py-12 font-semibold text-2xl text-center text-white">
+            Loading...
+          </p>
+        </template>
+      </Suspense>
     </div>
   </section>
 </template>

@@ -1,11 +1,14 @@
 <template>
     <div class="flex flex-col flex-1 items-center">
-        <div
-            v-if="route.query.preview"
-            class="text-white p-4 bg-weather-secondary w-full text-center"
+        <div 
+            class="text-white p-4 w-full text-center"
+            :class="route.query.preview ? 'bg-weather-secondary' : 'bg-green-800'"
         >
-            <p>
+            <p v-if="route.query.preview">
                 You are currently previewing this city, click the "+" icon to start tracking this city.
+            </p>
+            <p v-else>
+                You are currently tracking this city, click the "trash" icon to stop tracking.
             </p>
         </div>
 
