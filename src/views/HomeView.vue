@@ -1,6 +1,9 @@
 <script setup>
 import axios from 'axios';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   const mapboxPublicToken = import.meta.env.VITE_MAPBPOX_PUBLIC_TOKEN;
   const searchQuery = ref("");
@@ -24,6 +27,21 @@ import { ref } from 'vue';
       mapboxSearchResults.value = null;
     }, 300);
   };
+
+  const previewCity = (searchResult) => {
+    const countryName = searchResult.properties.context.country.name;
+    const cityName = searchResult.properties.context.place.name;
+
+    router.push({
+      name: "city",
+      params: { city: cityName, country: countryName },
+      query: {
+        lat: searchResult.geometry.coordinates[1],
+        lng: searchResult.geometry.coordinates[0],
+        preview: true
+      }
+    });
+  }
 </script>
 
 <template>
@@ -38,7 +56,7 @@ import { ref } from 'vue';
       >
       <ul
         v-if="mapboxSearchResults"
-        class="absolute bg-weather-secondary text-white w-full shadow-md p-2 top-[66px]"
+        class="absolute bg-weather-secondary text-white w-full shadow-md rounded-md p-2 top-[72px]"
       >
         <p v-if="searchError">
           Sorry, something went wrong. Please try again.
@@ -50,7 +68,8 @@ import { ref } from 'vue';
           <li
             v-for="searchResult in mapboxSearchResults"
             :key="searchResult.id"
-            class="py-2 cursor-pointer"
+            class="p-2 rounded-lg cursor-pointer hover:bg-weather-primary"
+            @click="previewCity(searchResult)"
           >
             {{ searchResult.properties.full_address }}
           </li>
